@@ -16,7 +16,7 @@ public class LoginScreen extends GridPane {
     private Candidate selectedCandidate;
     private Election election;
     
-    
+    private UserDatabase userDatabase = UserDatabase.getInstance();
 
     public LoginScreen(Stage primaryStage) {
     
@@ -49,7 +49,8 @@ public class LoginScreen extends GridPane {
         passwordField.getStyleClass().add("text-field");
         loginButton.getStyleClass().add("button");
         registerButton.getStyleClass().add("button");
-        
+        System.out.println("userDatabase "+ userDatabase);
+
         
        
         loginButton.setOnAction(event -> {
@@ -65,6 +66,7 @@ public class LoginScreen extends GridPane {
                 election.showMainScreen(primaryStage, username);
                 
                 if (previousVote != null) {
+                	
 //                    election.setSelectedCandidate(previousVote);
                 }
                 

@@ -7,10 +7,14 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import logic.Candidate;
-
-import java.util.List;
-
 import data.UserDatabase;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import data.PlayerType;
+
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.control.Button;
@@ -24,24 +28,42 @@ public class ResultsScreen {
         Label titleLabel = new Label("Election Results");
         titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
 
+        // Map для зберігання переможців за кожним типом
+        Map<PlayerType, Candidate> winnersMap = new HashMap<>();
+
+        // Знайдемо переможців для кожного типу
+        for (Candidate candidate : candidates) {
+            PlayerType type = candidate.getType();
+            if (!winnersMap.containsKey(type)) {
+                winnersMap.put(type, candidate);
+            } else {
+                Candidate currentWinner = winnersMap.get(type);
+                if (candidate.getVotes() > currentWinner.getVotes()) {
+                    winnersMap.put(type, candidate);
+                }
+            }
+        }
+
+        // Відобразимо результати
         VBox resultsBox = new VBox(10);
         resultsBox.setAlignment(Pos.CENTER);
 
-        for (Candidate candidate : candidates) {
-            Label candidateLabel = new Label(candidate.getName() + ": " + candidate.getVotes() + " votes");
-            resultsBox.getChildren().add(candidateLabel);
+        for (Map.Entry<PlayerType, Candidate> entry : winnersMap.entrySet()) {
+            PlayerType type = entry.getKey();
+            Candidate winner = entry.getValue();
+            Label winnerLabel = new Label("Winner for " + type + ": " + winner.getName() + " with " + winner.getVotes() + " votes");
+            resultsBox.getChildren().add(winnerLabel);
         }
 
         Button loginButton = new Button("Go to Login Screen");
         loginButton.setOnAction(event -> {
-//        	  Candidate selectedCandidate = UserDatabase.setSelectedCandidate(username, primaryStage);
-              if (selectedCandidate != null) {
-            	  UserDatabase.setSelectedCandidate(username, selectedCandidate);
-                  System.out.println(username + " voted for: " + selectedCandidate.getName());
-              } else {
-                  System.out.println(username + " did not vote.");
-              }
-        	UserDatabase.printDatabase();
+            if (selectedCandidate != null) {
+                UserDatabase.setSelectedCandidate(username, selectedCandidate);
+                System.out.println(username + " voted for: " + selectedCandidate.getName());
+            } else {
+                System.out.println(username + " did not vote.");
+            }
+            UserDatabase.printDatabase();
             LoginScreen loginScreen = new LoginScreen(primaryStage);
             primaryStage.setScene(new Scene(loginScreen, 400, 200));
             primaryStage.setTitle("Login");
